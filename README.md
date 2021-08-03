@@ -68,7 +68,7 @@ CREATE TABLE `auth_group_access` (
 # 原理
 Auth权限认证是按规则进行认证。 在数据库中我们有
 - 规则表（auth_rule）
-- 用户组表(auth_group)
+- 用户组表 （auth_group）
 - 用户-用户组关系表（auth_group_access）
 
 我们在规则表中定义权限规则， 在用户组表中定义每个用户组有哪些权限规则，在用户组明显表中定义用户所属的用户组。
