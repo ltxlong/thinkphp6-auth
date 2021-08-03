@@ -15,7 +15,11 @@ auth package for thinkphp6
     'auth_group_access' => 'auth_group_access', // 用户-用户组关系表(不带前缀表名)
     'auth_rule'         => 'auth_rule', // 权限规则表(不带前缀表名)
     'auth_user'         => 'user', // 用户信息表(不带前缀表名)
-],
+]
+// 注意：condition里的变量是用户表（配置auth_user的值的表，通常配置为用户表）的字段
+// （当然，不配置auth_user的值为用户表，而是其他表，那也行的！但是，condition里的变量只能是配置的表里面的字段）
+// （如配置auth_user的值为integral积分表，那么condition里的变量就只能是integral表里面的字段）
+// condition里的变量用花括号括住，如：{score}
 ~~~
 
 # 导入数据表
