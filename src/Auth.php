@@ -132,13 +132,12 @@ class Auth
 
     /**
      * 初始化
-     * @param array $options 参数
      * @return 对象实例|static
      */
-    public static function instance($options = [])
+    public static function instance()
     {
         if (is_null(self::$instance)) {
-            self::$instance = new static($options);
+            self::$instance = new static();
         }
 
         return self::$instance;
