@@ -20,6 +20,8 @@ auth package for thinkphp6
 // （当然，不配置auth_user的值为用户表，而是其他表，那也行的！但是，condition里的变量只能是配置的表里面的字段）
 // （如配置auth_user的值为integral积分表，那么condition里的变量就只能是integral表里面的字段）
 // condition里的变量用花括号括住，如：{score}
+
+// 表的前缀在框架的数据库配置那配置，这里的配置的表都是不带前缀的
 ~~~
 
 # 导入数据表
