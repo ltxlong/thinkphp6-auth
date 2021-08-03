@@ -156,16 +156,16 @@ $auth->getGroups(uid)
 Auth类还可以按用户属性进行判断权限， 比如 按照用户积分进行判断， 假设我们的用户表 (user) 有字段 score 记录了用户积分。 
 我在规则表添加规则时，定义规则表的condition 字段，condition字段是规则条件，默认为空 表示没有附加条件，用户组中只有规则 就通过认证。 
 如果定义了 condition字段，用户组中有规则不一定能通过认证，程序还会判断是否满足附加条件。 比如我们添加几条规则：
-> name字段：grade1 condition字段：{score}<100
-> name字段：grade2 condition字段：{score}>100 && {score}<200
-> name字段：grade3 condition字段：{score}>200 && {score}<300
+>name字段：grade1 condition字段：{score}<100
+>name字段：grade2 condition字段：{score}>100 && {score}<200
+>name字段：grade3 condition字段：{score}>200 && {score}<300
 
 这里 {score} 表示 user 表 中字段 score 的值。
 
 那么这时候
-> $auth->check('grade1', uid) 是判断用户积分是不是0-100
-> $auth->check('grade2', uid) 判断用户积分是不是在100-200
-> $auth->check('grade3', uid) 判断用户积分是不是在200-300
+>$auth->check('grade1', uid) 是判断用户积分是不是0-100
+>$auth->check('grade2', uid) 判断用户积分是不是在100-200
+>$auth->check('grade3', uid) 判断用户积分是不是在200-300
 
 condition 支持的运算符号：
 ~~~
