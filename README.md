@@ -184,3 +184,6 @@ condition 支持的运算符号：
 ~~~
 {score}<50 && {score}<100 || {name}!=abc
 ~~~
+
+# 最后
+因为觉得eval()函数不安全，所以自己写了个简单的函数来运算condition
