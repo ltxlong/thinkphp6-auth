@@ -180,6 +180,7 @@ condition 支持的运算符号：
 >= > <= < && == || !=
 ~~~
 注意：condition表达式不支持括号()，不支持单引号''，也不支持双引号""
+
 复杂点的condition:
 ~~~
 {score}<50 && {score}<100 || {name}!=abc
