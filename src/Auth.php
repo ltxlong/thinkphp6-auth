@@ -248,7 +248,7 @@ class Auth
         }
 
         // 读取用户组所有权限规则
-        $rules = Db::name($this->config['auth_rule'])->where(['id' => ['in', $ids]])->field('condition,name')->select();
+        $rules = Db::name($this->config['auth_rule'])->where('id', 'in', $ids)->field('condition,name')->select();
         // 循环规则，判断结果
         $authList = [];
         if (!$rules->isEmpty()) {
