@@ -22,8 +22,8 @@ use think\facade\Session;
  *
  * 2，认证的场景
  *      可以对节点进行认证，也就是把节点作为规则
- *            这个节点就是 模块/控制器/方法
- *            把节点作为规则，那么这个规则名称就是'模块/控制器/方法'，也可以是'模块_控制器_方法'，也可以是'控制器_方法'等等
+ *            这个节点就是 模块/控制器/方法 或者 控制器/方法
+ *            把节点作为规则，那么这个规则名称就是'模块/控制器/方法'，也可以是'控制器/方法'，也可以是'控制器_方法'等等
  *            通常节点作为规则认证，是在baseController（自定义的base，非框架自带的，继承框架自带的）里面进行认证的
  *      除了节点作为规则进行认证，就是自定义规则了
  *            自定义规则名称，如button_click
@@ -42,13 +42,13 @@ use think\facade\Session;
  *
  * 6，支持规则表达式
  *      在auth_rule的condition字段就可以定义规则表达式。
- *      如定义score>5 && score<100  表示用户的分数在5-100之间时这条规则才会通过。
- *      再复杂点的：score<50 && score<100 || name!=abc（注意，这里的abc不能用单引号或者双引号包裹）。
+ *      如定义{score}>5 && {score}<100  表示用户的分数在5-100之间时这条规则才会通过。
+ *      再复杂点的：{score}<50 && {score}<100 || {name}!=abc（注意，这里的abc不能用单引号或者双引号包裹）。
  *      注意：condition里的变量是用户表（配置auth_user的值的表，通常配置为用户表）的字段
  *      （当然，不配置auth_user的值为用户表，而是其他表，那也行的！但是，condition里的变量只能是配置的表里面的字段）
  *      （如配置auth_user的值为integral积分表，那么condition里的变量就只能是integral表里面的字段）
  *      支持的运算符号：>= > <= < && == || !=
- *      注意：不支持括号
+ *      注意：不支持括号()
  */
 //数据库
 /*
@@ -58,10 +58,10 @@ auth_type 实时认证和登录认证的区别：
 -- auth_rule，规则表，
 -- id:主键，
 -- name：规则唯一标识, title：规则中文名称 status 状态：为1正常，为0禁用
--- name 可以自定义名称，也可以是模块/控制器/方法、模块_控制器_方法、控制器_方法
+-- name 可以自定义名称，也可以是模块/控制器/方法、模块_控制器_方法、控制器/方法、控制器_方法
 -- condition：规则表达式，为空表示存在就验证，不为空表示按照条件验证
 -- condition 简单来说，如果字段为空，则只验证name就行；如果字段不为空，则在验证了name的基础上，还要验证字段里面的条件
--- condition 条件，是user表的字段条件（准确来说，是auth_user配置的表），如 score > 10
+-- condition 条件，是user表的字段条件（准确来说，是auth_user配置的表），如 {score} > 10
 ----------------------------------------------------------------------------
 DROP TABLE IF EXISTS `auth_rule`;
 CREATE TABLE `auth_rule` (
@@ -193,10 +193,7 @@ class Auth
     /**
      * 获取用户组，外部也可以调用
      * @param $uid -- 用户id
-     * @return array|mixed
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
+     * @return array
      */
     public function getGroups($uid)
     {
@@ -224,9 +221,6 @@ class Auth
      * 获取权限列表
      * @param $uid -- 用户id
      * @return array|mixed
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
      */
     protected function getAuthList($uid)
     {
@@ -286,10 +280,7 @@ class Auth
     /**
      * 获取用户资料，根据自己的情况读取数据库
      * @param $uid -- 用户id
-     * @return array|mixed|Db|\think\Model|null
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
+     * @return array
      */
     protected function getUserInfo($uid)
     {
@@ -300,7 +291,12 @@ class Auth
         $_pk = is_string($user->getPk()) ? $user->getPk() : 'uid';
 
         if (!isset($userInfo[$uid])) {
-            $userInfo[$uid] = $user->where($_pk, $uid)->find();
+            $userData = $user->where($_pk, $uid)->find();
+            if (empty($userData)) {
+                $userInfo[$uid] = [];
+            } else {
+                $userInfo[$uid] = $userData;
+            }
         }
 
         return $userInfo[$uid];
@@ -310,8 +306,8 @@ class Auth
      * 字符串运算
      * @param $str -- 字符串
      * @param $data -- 用户数据
-     * @return bool|mixed|null
-     * $str 示例 $str = "score<50 && score<100 || name!=abc"; （abc不能用单引号或双引号包裹）
+     * @return bool
+     * $str 示例 $str = "{score}<50 && {score}<100 || {name}!=abc"; （abc不能用单引号或双引号包裹）
      * $data 示例 $data = ['score'=>30, 'name'=>'abc'];
      */
     protected function strOp($str, $data)
@@ -324,7 +320,7 @@ class Auth
 
         // 数据填充，得到不含变量的运算字符串
         foreach ($data as $k => $v) {
-            $str = str_replace($k, $v, $str);
+            $str = str_replace('{' . $k . '}', $v, $str);
         }
 
         // 运算字符串转数组
